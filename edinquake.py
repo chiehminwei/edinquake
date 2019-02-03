@@ -13,8 +13,7 @@ class EdinquakeModel(object):
     def __init__(self, input_batch, output_dim,
                  rnn_hidden_size=128, rnn_num_layers=2, rnn_dropout_rate=0.1, 
                  mlp_hidden_size=128, mlp_num_layers=3, mlp_dropout_rate=0.1,
-                 initializers, max_seq_length, labels, length_mask, 
-                 l2_scale, is_training):
+                 initializers, labels, length_mask, l2_scale, is_training):
         if not is_training:
             rnn_dropout_rate = 0.0
             mlp_dropout_rate = 0.0
@@ -31,7 +30,6 @@ class EdinquakeModel(object):
         self.mlp_num_layers = mlp_num_layers
         self.mlp_dropout_rate = mlp_dropout_rate
         self.initializers = initializers
-        self.max_seq_length = max_seq_length
         self.labels = labels
         self.length_mask = length_mask
         self.l2_scale = l2_scale
