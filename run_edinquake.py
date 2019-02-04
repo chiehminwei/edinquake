@@ -164,7 +164,7 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
 
 	name_to_features = {
 			"inputs": tf.FixedLenFeature([seq_length], tf.int64),
-			"labels": tf.FixedLenFeature([seq_length], tf.int64)
+			"labels": tf.FixedLenFeature([seq_length], tf.int64),
 			"length_mask": tf.FixedLenFeature([seq_length], tf.int64)
 	}
 
