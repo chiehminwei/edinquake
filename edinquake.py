@@ -11,8 +11,8 @@ from tensorflow.contrib import rnn
 
 class EdinquakeModel(object):
 		def __init__(self, input_batch, output_dim,
-								 rnn_hidden_size=128, rnn_num_layers=2, rnn_dropout_rate=0.1, 
-								 mlp_hidden_size=128, mlp_num_layers=3, mlp_dropout_rate=0.1,
+								 rnn_hidden_size, rnn_num_layers, rnn_dropout_rate, 
+								 mlp_hidden_size, mlp_num_layers, mlp_dropout_rate,
 								 initializers, labels, length_mask, l2_scale, is_training):
 				if not is_training:
 						rnn_dropout_rate = 0.0
