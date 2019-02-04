@@ -57,7 +57,7 @@ class DataProcessor(object):
 		raise NotImplementedError()
 
 	@classmethod
-	def _read_csv(cls, input_file, quotechar=None):
+	def _read_tsv(cls, input_file, quotechar=None):
 		"""Reads a tab separated value file."""
 		with tf.gfile.Open(input_file, "r") as f:
 			reader = csv.reader(f, delimiter=",", quotechar=quotechar)
