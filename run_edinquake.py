@@ -10,7 +10,7 @@ import optimization
 
 from edinquake import EdinquakeModel
 from tensorflow.contrib.layers.python.layers import initializers
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 class InputExample(object):
 	"""A single training/test example for simple sequence classification."""
@@ -94,7 +94,7 @@ class EdinquakeProcessor(DataProcessor):
 				guid = "train-%d" % (i)
 
 				example = InputExample(guid, acoustic_signals, labels, length_mask)
-				features = collections.OrderedDict()
+				features = OrderedDict()
 				features["inputs"] = create_int_feature(example.acoustic_signals)
 				features["labels"] = create_int_feature(example.labels)
 				features["length_mask"] = create_int_feature(example.length_mask)
