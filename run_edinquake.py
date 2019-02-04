@@ -41,24 +41,24 @@ class DataProcessor(object):
 	"""Base class for data converters for sequence regression data sets."""
 
 	def get_train_examples(self, data_dir):
-	"""Gets a collection of `InputExample`s for the train set."""
+		"""Gets a collection of `InputExample`s for the train set."""
 	raise NotImplementedError()
 
 	def get_dev_examples(self, data_dir):
-	"""Gets a collection of `InputExample`s for the dev set."""
+		"""Gets a collection of `InputExample`s for the dev set."""
 	raise NotImplementedError()
 
 	def get_test_examples(self, data_dir):
-	"""Gets a collection of `InputExample`s for the dev set."""
+		"""Gets a collection of `InputExample`s for the dev set."""
 	raise NotImplementedError()
 
 	def get_labels(self):
-	"""Gets the list of labels for this data set."""
+		"""Gets the list of labels for this data set."""
 	raise NotImplementedError()
 
 	@classmethod
 	def _read_csv(cls, input_file, quotechar=None):
-	"""Reads a tab separated value file."""
+		"""Reads a tab separated value file."""
 	with tf.gfile.Open(input_file, "r") as f:
 		reader = csv.reader(f, delimiter=",", quotechar=quotechar)
 		lines = []
@@ -107,7 +107,7 @@ class EdinquakeProcessor(DataProcessor):
 		return examples
 
 	def get_dev_examples(self, data_dir, max_seq_length):
-	"""See base class."""
+		"""See base class."""
 		lines = self._read_tsv(os.path.join(data_dir, "dev.tsv"))
 		examples = []
 		for (i, line) in enumerate(lines):
@@ -121,7 +121,7 @@ class EdinquakeProcessor(DataProcessor):
 		return examples
 
 	def get_test_examples(self, data_dir):
-	"""See base class."""
+		"""See base class."""
 		lines = self._read_tsv(os.path.join(data_dir, "test.tsv"))
 		true_labels = []
 		examples = []
