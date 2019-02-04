@@ -84,7 +84,7 @@ class EdinquakeProcessor(DataProcessor):
 		with tf.gfile.Open(input_file, "r") as f:
 			# examples = []
 			for (i, line) in enumerate(f):
-        if i % 10000 == 0:
+				if i % 10000 == 0:
 					tf.logging.info("Writing example %d" % (i))
 
 				acoustic_signals, labels = line.split('\t')
