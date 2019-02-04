@@ -74,17 +74,34 @@ class EdinquakeProcessor(DataProcessor):
 
 	def get_train_examples(self, data_dir):
 		input_file = os.path.join(data_dir, "quakes_128_real")
+		output_file = os.path.join(data_dir, "train.tf_record")
+		writer = tf.python_io.TFRecordWriter(output_file)
+
+		def create_int_feature(values):
+			f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
+			return f
+
 		with tf.gfile.Open(input_file, "r") as f:
-			examples = []
+			# examples = []
 			for (i, line) in enumerate(f):
+        if i % 10000 == 0:
+					tf.logging.info("Writing example %d" % (i))
+
 				acoustic_signals, labels = line.split('\t')
 				acoustic_signals = [float(signal) for signal in acoustic_signals.split(',')]
 				labels = [float(label) for label in labels.split(',')]
 				length_mask = [1] * self.max_seq_length
 				guid = "train-%d" % (i)
-				examples.append(
-					InputExample(guid, acoustic_signals, labels, length_mask))
-			return examples
+
+				example = InputExample(guid, acoustic_signals, labels, length_mask)
+				features = collections.OrderedDict()
+				features["inputs"] = create_int_feature(example.acoustic_signals)
+				features["labels"] = create_int_feature(example.labels)
+				features["length_mask"] = create_int_feature(example.length_mask)
+
+				tf_example = tf.train.Example(features=tf.train.Features(feature=features))
+				writer.write(tf_example.SerializeToString())		
+
 
 	# def get_train_examples(self, data_dir):
 	# 	lines = self._read_csv(os.path.join(data_dir,'train.csv'))
