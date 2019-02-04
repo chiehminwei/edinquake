@@ -73,38 +73,51 @@ class EdinquakeProcessor(DataProcessor):
 		self.max_seq_length = max_seq_length
 
 	def get_train_examples(self, data_dir):
-		lines = self._read_csv(os.path.join(data_dir,'train.csv'))
+		lines = self._read_tsv(os.path.join(data_dir, "quakes_128_real"))
 		examples = []
-
-		acoustic_signals = []
-		labels = []
-		length_mask = []
-		guid_counter = 0
 		for (i, line) in enumerate(lines):
-			acoustic_signal, label = [float(string) for string in line.split(',')]
-			acoustic_signals.append(acoustic_signal)
-			labels.append(label)
-			length_mask.append(1.0)
-			if len(acoustic_signals) == self.max_seq_length:
-				guid = "train-%d" % (guid_counter)
-				examples.append(
-					InputExample(guid, acoustic_signals, labels, length_mask))
-				guid_counter += 1
-				acoustic_signals = []
-				labels = []
-				length_mask = []
+			acoustic_signals, labels = line.split('\t')
+			acoustic_signals = [float(signal) for signal in acoustic_signals.split(',')]
+			labels = [float(label) for label in labels.split(',')]
 
-		assert len(acoustic_signals) <= self.max_seq_length
-		if len(acoustic_signals) < self.max_seq_length:
-			diff = self.max_seq_length - len(acoustic_signals)
-			acoustic_signals += [0.0] * diff
-			labels += [0.0] * diff
-			length_mask += [0.0] * diff
-			guid = "train-%d" % (guid_counter)
+			guid = "train-%d" % (i)
 			examples.append(
-					InputExample(guid, acoustic_signals, labels, length_mask))
-
+				InputExample(guid, acoustic_signals, labels, length_mask))
 		return examples
+
+	# def get_train_examples(self, data_dir):
+	# 	lines = self._read_csv(os.path.join(data_dir,'train.csv'))
+	# 	examples = []
+
+	# 	acoustic_signals = []
+	# 	labels = []
+	# 	length_mask = []
+	# 	guid_counter = 0
+	# 	for (i, line) in enumerate(lines):
+	# 		acoustic_signal, label = [float(string) for string in line.split(',')]
+	# 		acoustic_signals.append(acoustic_signal)
+	# 		labels.append(label)
+	# 		length_mask.append(1.0)
+	# 		if len(acoustic_signals) == self.max_seq_length:
+	# 			guid = "train-%d" % (guid_counter)
+	# 			examples.append(
+	# 				InputExample(guid, acoustic_signals, labels, length_mask))
+	# 			guid_counter += 1
+	# 			acoustic_signals = []
+	# 			labels = []
+	# 			length_mask = []
+
+	# 	assert len(acoustic_signals) <= self.max_seq_length
+	# 	if len(acoustic_signals) < self.max_seq_length:
+	# 		diff = self.max_seq_length - len(acoustic_signals)
+	# 		acoustic_signals += [0.0] * diff
+	# 		labels += [0.0] * diff
+	# 		length_mask += [0.0] * diff
+	# 		guid = "train-%d" % (guid_counter)
+	# 		examples.append(
+	# 				InputExample(guid, acoustic_signals, labels, length_mask))
+
+	# 	return examples
 
 	def get_dev_examples(self, data_dir, max_seq_length):
 		"""See base class."""
