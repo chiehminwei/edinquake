@@ -77,8 +77,8 @@ class EdinquakeProcessor(DataProcessor):
 		output_file = os.path.join(data_dir, "train.tf_record")
 		writer = tf.python_io.TFRecordWriter(output_file)
 
-		def create_int_feature(values):
-			f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
+		def create_float_feature(values):
+			f = tf.train.Feature(float_list=tf.train.FloatList(value=list(values)))
 			return f
 
 		with tf.gfile.Open(input_file, "r") as f:
@@ -90,14 +90,14 @@ class EdinquakeProcessor(DataProcessor):
 				acoustic_signals, labels = line.split('\t')
 				acoustic_signals = [float(signal) for signal in acoustic_signals.split(',')]
 				labels = [float(label) for label in labels.split(',')]
-				length_mask = [1] * self.max_seq_length
+				length_mask = [1.0] * self.max_seq_length
 				guid = "train-%d" % (i)
 
 				example = InputExample(guid, acoustic_signals, labels, length_mask)
 				features = OrderedDict()
-				features["inputs"] = create_int_feature(example.acoustic_signals)
-				features["labels"] = create_int_feature(example.labels)
-				features["length_mask"] = create_int_feature(example.length_mask)
+				features["inputs"] = create_float_feature(example.acoustic_signals)
+				features["labels"] = create_float_feature(example.labels)
+				features["length_mask"] = create_float_feature(example.length_mask)
 
 				tf_example = tf.train.Example(features=tf.train.Features(feature=features))
 				writer.write(tf_example.SerializeToString())		
@@ -194,9 +194,9 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
 	"""Creates an `input_fn` closure to be passed to TPUEstimator."""
 
 	name_to_features = {
-			"inputs": tf.FixedLenFeature([seq_length], tf.int64),
-			"labels": tf.FixedLenFeature([seq_length], tf.int64),
-			"length_mask": tf.FixedLenFeature([seq_length], tf.int64)
+			"inputs": tf.FixedLenFeature([seq_length], tf.float64),
+			"labels": tf.FixedLenFeature([seq_length], tf.float64),
+			"length_mask": tf.FixedLenFeature([seq_length], tf.float64)
 	}
 
 	def _decode_record(record, name_to_features):
@@ -206,8 +206,8 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
 		# So cast all int64 to int32.
 		for name in list(example.keys()):
 			t = example[name]
-			if t.dtype == tf.int64:
-				t = tf.to_int32(t)
+			if t.dtype == tf.float64:
+				t = tf.to_float(t)
 			example[name] = t
 
 		return example
