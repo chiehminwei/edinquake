@@ -73,17 +73,18 @@ class EdinquakeProcessor(DataProcessor):
 		self.max_seq_length = max_seq_length
 
 	def get_train_examples(self, data_dir):
-		lines = self._read_tsv(os.path.join(data_dir, "quakes_128_real"))
-		examples = []
-		for (i, line) in enumerate(lines):
-			acoustic_signals, labels = line.split('\t')
-			acoustic_signals = [float(signal) for signal in acoustic_signals.split(',')]
-			labels = [float(label) for label in labels.split(',')]
-
-			guid = "train-%d" % (i)
-			examples.append(
-				InputExample(guid, acoustic_signals, labels, length_mask))
-		return examples
+		input_file = os.path.join(data_dir, "quakes_128_real")
+		with tf.gfile.Open(input_file, "r") as f:
+			examples = []
+			for (i, line) in enumerate(f):
+				acoustic_signals, labels = line.split('\t')
+				acoustic_signals = [float(signal) for signal in acoustic_signals.split(',')]
+				labels = [float(label) for label in labels.split(',')]
+				length_mask = [1] * self.max_seq_length
+				guid = "train-%d" % (i)
+				examples.append(
+					InputExample(guid, acoustic_signals, labels, length_mask))
+			return examples
 
 	# def get_train_examples(self, data_dir):
 	# 	lines = self._read_csv(os.path.join(data_dir,'train.csv'))
