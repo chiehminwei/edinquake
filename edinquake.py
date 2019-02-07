@@ -56,7 +56,7 @@ class EdinquakeModel(object):
 
 		def _mlp_layer(self, prev_output):
 				with tf.variable_scope('mlp_layer'):
-						regularizer = tf.nn.l2_regularizer(scale=self.l2_scale)
+						regularizer = tf.contrib.layers.l2_regularizer(scale=self.l2_scale)
 						for layer_idx in range(self.mlp_num_layers):
 								with tf.variable_scope("MLP_layer_%d" % layer_idx):
 										layer_input = prev_output
