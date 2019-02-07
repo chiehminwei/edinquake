@@ -194,9 +194,9 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
 	"""Creates an `input_fn` closure to be passed to TPUEstimator."""
 
 	name_to_features = {
-			"inputs": tf.FixedLenFeature([seq_length], tf.float64),
-			"labels": tf.FixedLenFeature([seq_length], tf.float64),
-			"length_mask": tf.FixedLenFeature([seq_length], tf.float64)
+			"inputs": tf.FixedLenFeature([seq_length], tf.float32),
+			"labels": tf.FixedLenFeature([seq_length], tf.float32),
+			"length_mask": tf.FixedLenFeature([seq_length], tf.float32)
 	}
 
 	def _decode_record(record, name_to_features):
