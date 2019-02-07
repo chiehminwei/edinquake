@@ -254,6 +254,7 @@ def model_fn_builder(learning_rate, num_train_steps, num_warmup_steps, use_tpu, 
 		inputs = features["inputs"]
 		labels = features["labels"]
 		length_mask = features["length_mask"]
+		length_mask = tf.expand_dims(length_mask, -1)
 
 		is_training = (mode == tf.estimator.ModeKeys.TRAIN)
 
