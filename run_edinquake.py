@@ -266,7 +266,7 @@ def model_fn_builder(learning_rate, num_train_steps, num_warmup_steps, use_tpu, 
 		def tpu_scaffold():
 				return tf.train.Scaffold()
 
-		scaffold_fn = tpu_scaffoldm
+		scaffold_fn = tpu_scaffold
 		output_spec = None
 		if mode == tf.estimator.ModeKeys.TRAIN:
 
