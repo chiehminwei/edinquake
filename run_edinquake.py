@@ -235,6 +235,7 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
 
 def create_model(is_training, inputs, labels, rnn_hidden_size,
 											rnn_num_layers, rnn_dropout, mlp_hidden_size, mlp_num_layers, mlp_dropout, l2_scale, length_mask):
+	inputs = tf.expand_dims(inputs, -1)
 	model = EdinquakeModel(inputs, 1,
 								 rnn_hidden_size, rnn_num_layers, rnn_dropout, 
 								 mlp_hidden_size, mlp_num_layers, mlp_dropout,
