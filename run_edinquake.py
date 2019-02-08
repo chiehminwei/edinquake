@@ -197,7 +197,7 @@ def file_based_test_input_fn_builder(input_file, seq_length, is_training, drop_r
 			"inputs": tf.FixedLenFeature([seq_length], tf.float32),
 			"labels": tf.FixedLenFeature([seq_length], tf.float32),
 			"length_mask": tf.FixedLenFeature([seq_length], tf.float32),
-			"seg_id": tf.FixedLenFeature([1], tf.strings)
+			"seg_id": tf.FixedLenFeature([], tf.string)
 	}
 
 	def _decode_record(record, name_to_features):
