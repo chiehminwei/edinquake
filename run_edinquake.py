@@ -168,27 +168,72 @@ class EdinquakeProcessor(DataProcessor):
 
 # def convert_single_example():
 
-def file_based_convert_examples_to_features(examples, output_file):
-	"""Convert a set of `InputExample`s to a TFRecord file."""
-	writer = tf.python_io.TFRecordWriter(output_file)
+# def file_based_convert_examples_to_features(examples, output_file):
+# 	"""Convert a set of `InputExample`s to a TFRecord file."""
+# 	writer = tf.python_io.TFRecordWriter(output_file)
 
-	for (ex_index, example) in enumerate(examples):
-		if ex_index % 10000 == 0:
-			tf.logging.info("Writing example %d of %d" % (ex_index, len(examples)))
+# 	for (ex_index, example) in enumerate(examples):
+# 		if ex_index % 10000 == 0:
+# 			tf.logging.info("Writing example %d of %d" % (ex_index, len(examples)))
 
-		# feature = convert_single_example(ex_index, example)
-		feature = example
+# 		# feature = convert_single_example(ex_index, example)
+# 		feature = example
 
-		def create_int_feature(values):
-			f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
-			return f
-		features = collections.OrderedDict()
-		features["inputs"] = create_int_feature(feature.acoustic_signals)
-		features["labels"] = create_int_feature(feature.labels)
-		features["length_mask"] = create_int_feature(feature.length_mask)
+# 		def create_int_feature(values):
+# 			f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
+# 			return f
+# 		features = collections.OrderedDict()
+# 		features["inputs"] = create_int_feature(feature.acoustic_signals)
+# 		features["labels"] = create_int_feature(feature.labels)
+# 		features["length_mask"] = create_int_feature(feature.length_mask)
 		
-		tf_example = tf.train.Example(features=tf.train.Features(feature=features))
-		writer.write(tf_example.SerializeToString())
+# 		tf_example = tf.train.Example(features=tf.train.Features(feature=features))
+# 		writer.write(tf_example.SerializeToString())
+
+def file_based_test_input_fn_builder(input_file, seq_length, is_training, drop_remainder):
+	"""Creates an `input_fn` closure to be passed to TPUEstimator."""
+
+	name_to_features = {
+			"inputs": tf.FixedLenFeature([seq_length], tf.float32),
+			"labels": tf.FixedLenFeature([seq_length], tf.float32),
+			"length_mask": tf.FixedLenFeature([seq_length], tf.float32),
+			"seg_id": tf.FixedLenFeature([1], tf.strings)
+	}
+
+	def _decode_record(record, name_to_features):
+		"""Decodes a record to a TensorFlow example."""
+		example = tf.parse_single_example(record, name_to_features)
+		# tf.Example only supports tf.int64, but the TPU only supports tf.int32.
+		# So cast all int64 to int32.
+		for name in list(example.keys()):
+			t = example[name]
+			if t.dtype == tf.float64:
+				t = tf.to_float(t)
+			example[name] = t
+
+		return example
+
+	def input_fn(params):
+		"""The actual input function."""
+		batch_size = params["batch_size"]
+
+		# For training, we want a lot of parallel reading and shuffling.
+		# For eval, we want no shuffling and parallel reading doesn't matter.
+		d = tf.data.TFRecordDataset(input_file)
+		if is_training:
+			d = d.repeat()
+			d = d.shuffle(buffer_size=100)
+
+		d = d.apply(
+				tf.contrib.data.map_and_batch(
+						lambda record: _decode_record(record, name_to_features),
+						batch_size=batch_size,
+						drop_remainder=drop_remainder))
+
+		return d
+
+	return input_fn
+
 
 def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remainder):
 	"""Creates an `input_fn` closure to be passed to TPUEstimator."""
@@ -196,7 +241,8 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
 	name_to_features = {
 			"inputs": tf.FixedLenFeature([seq_length], tf.float32),
 			"labels": tf.FixedLenFeature([seq_length], tf.float32),
-			"length_mask": tf.FixedLenFeature([seq_length], tf.float32)
+			"length_mask": tf.FixedLenFeature([seq_length], tf.float32),
+			# "seg_id": tf.FixedLenFeature([1], tf.strings)
 	}
 
 	def _decode_record(record, name_to_features):
