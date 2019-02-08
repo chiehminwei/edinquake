@@ -339,9 +339,10 @@ def model_fn_builder(learning_rate, num_train_steps, num_warmup_steps, use_tpu, 
 					eval_metrics=eval_metrics,
 					scaffold_fn=scaffold_fn)
 		else:
+			seg_id = features["seg_id"]
 			output_spec = tf.contrib.tpu.TPUEstimatorSpec(
 				 mode=mode,
-				 predictions={"predictions": predictions},
+				 predictions={"predictions": predictions, "seg_id": seg_id},
 				 scaffold_fn=scaffold_fn)
 		return output_spec
 
